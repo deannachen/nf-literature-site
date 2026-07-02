@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NF 文献库 · 神经纤维瘤病研究追踪</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:        #1a1a2e;
+      --ink-light:  #4a4a6a;
+      --ink-faint:  #8888aa;
+      --paper:      #f7f7fb;
+      --surface:    #ffffff;
+      --rule:       #e2e2ee;
+      --accent:     #2d5be3;
+      --accent-dim: #e8edfb;
+      --nf1:        #1a7a4a;
+      --nf1-bg:     #e8f5ee;
+      --nf2:        #1a5fa0;
+      --nf2-bg:     #e8f0fb;
+      --mpnst:      #c0392b;
+      --mpnst-bg:   #fdecea;
+      --schwann:    #7b4fa0;
+      --schwann-bg: #f3ecfb;
+      --other:      #666688;
+      --other-bg:   #f0f0f8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--ink);
+      color: #fff;
+      padding: 32px 40px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .header-left h1 {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.3;
+    }
+    .header-left .subtitle {
+      font-size: 12px;
+      color: #aaaacc;
+      margin-top: 4px;
+      font-weight: 300;
+    }
+    .header-right {
+      font-size: 11px;
+      color: #8888aa;
+      text-align: right;
+      white-space: nowrap;
+    }
+    #last-updated { color: #aaaacc; }
+
+    /* ── Controls ── */
+    .controls {
+      background: var(--surface);
+      border-bottom: 1px solid var(--rule);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-faint);
+      pointer-events: none;
+    }
+    #search {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #search:focus { border-color: var(--accent); }
+    #search::placeholder { color: var(--ink-faint); }
+
+    select {
+      padding: 9px 12px;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--ink);
+      background: var(--paper);
+      outline: none;
+      cursor: pointer;
+    }
+    select:focus { border-color: var(--accent); }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid var(--rule);
+      background: var(--surface);
+      padding: 0 40px;
+    }
+    .tab {
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-faint);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .tab-count {
+      display: inline-block;
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      margin-left: 6px;
+      font-weight: 500;
+    }
+
+    /* ── Main ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 40px 60px;
+    }
+
+    .results-info {
+      font-size: 12px;
+      color: var(--ink-faint);
+      margin-bottom: 16px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 10px;
+      transition: box-shadow 0.15s;
+    }
+    .card:hover { box-shadow: 0 2px 12px rgba(45,91,227,0.08); }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .card-badges {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+    .badge-source {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+    .badge-nf1   { background: var(--nf1-bg);    color: var(--nf1); }
+    .badge-nf2   { background: var(--nf2-bg);    color: var(--nf2); }
+    .badge-mpnst { background: var(--mpnst-bg);  color: var(--mpnst); }
+    .badge-schwannomatosis { background: var(--schwann-bg); color: var(--schwann); }
+    .badge-other { background: var(--other-bg);  color: var(--other); }
+
+    .card-title {
+      flex: 1;
+    }
+    .title-zh {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+    .title-en {
+      font-size: 12px;
+      color: var(--ink-light);
+      margin-top: 3px;
+      font-style: italic;
+    }
+    .title-zh a, .title-en a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .title-zh a:hover { color: var(--accent); }
+
+    .card-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--ink-faint);
+      margin-bottom: 8px;
+    }
+    .card-meta span { display: flex; align-items: center; gap: 4px; }
+
+    .abstract {
+      font-size: 12px;
+      color: var(--ink-light);
+      line-height: 1.7;
+      border-top: 1px solid var(--rule);
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+    .abstract-toggle {
+      background: none;
+      border: none;
+      font-size: 11px;
+      color: var(--accent);
+      cursor: pointer;
+      padding: 0;
+      margin-top: 4px;
+      font-family: inherit;
+    }
+
+    /* ── Trial card extras ── */
+    .trial-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+      border-top: 1px solid var(--rule);
+      padding-top: 10px;
+    }
+    .trial-field { font-size: 11px; }
+    .trial-field .label { color: var(--ink-faint); margin-bottom: 2px; }
+    .trial-field .value { color: var(--ink); font-weight: 500; }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--ink-faint);
+    }
+    .empty svg { margin-bottom: 12px; opacity: 0.3; }
+
+    /* ── Loading ── */
+    .loading {
+      text-align: center;
+      padding: 60px;
+      color: var(--ink-faint);
+      font-size: 13px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 11px;
+      color: var(--ink-faint);
+      border-top: 1px solid var(--rule);
+    }
+
+    @media (max-width: 640px) {
+      header, .controls, .tabs, main { padding-left: 16px; padding-right: 16px; }
+      header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>NF 文献库</h1>
+    <div class="subtitle">神经纤维瘤病国际研究追踪 · 每日自动更新</div>
+  </div>
+  <div class="header-right">
+    数据来源：PubMed · Europe PMC · bioRxiv · ClinicalTrials.gov 等<br>
+    最后更新：<span id="last-updated">加载中…</span>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input id="search" type="text" placeholder="搜索标题、作者、摘要…">
+  </div>
+  <select id="filter-source">
+    <option value="">全部来源</option>
+  </select>
+  <select id="filter-tag">
+    <option value="">全部疾病</option>
+    <option value="NF1">NF1</option>
+    <option value="NF2">NF2</option>
+    <option value="MPNST">MPNST</option>
+    <option value="Schwannomatosis">Schwannomatosis</option>
+  </select>
+  <select id="filter-days">
+    <option value="0">全部时间</option>
+    <option value="7">最近 7 天</option>
+    <option value="30">最近 30 天</option>
+    <option value="90">最近 90 天</option>
+  </select>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="lit">
+    文献 <span class="tab-count" id="count-lit">0</span>
+  </div>
+  <div class="tab" data-tab="trial">
+    临床试验 <span class="tab-count" id="count-trial">0</span>
+  </div>
+</div>
+
+<main>
+  <div class="results-info" id="results-info"></div>
+  <div id="list"><div class="loading">正在加载数据…</div></div>
+</main>
+
+<footer>
+  NF 文献库 · 数据每日自动更新 · 仅供参考，不构成医疗建议
+</footer>
+
+<script>
+let allLit = [], allTrial = [];
+let currentTab = 'lit';
+
+// ── Load data ────────────────────────────────────────────────────
+async function loadData() {
+  try {
+    const resp = await fetch('data.json?v=' + Date.now());
+    const data = await resp.json();
+    allLit   = data.literature || [];
+    allTrial = data.trials || [];
+    document.getElementById('last-updated').textContent = data.updated || '未知';
+    populateSources();
+    render();
+  } catch(e) {
+    document.getElementById('list').innerHTML =
+      '<div class="empty">数据加载失败，请稍后刷新重试。</div>';
+  }
+}
+
+// ── Populate source filter ────────────────────────────────────────
+function populateSources() {
+  const all = [...allLit, ...allTrial];
+  const sources = [...new Set(all.map(a => a.source).filter(Boolean))].sort();
+  const sel = document.getElementById('filter-source');
+  sources.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+}
+
+// ── Filter ───────────────────────────────────────────────────────
+function getFiltered() {
+  const q      = document.getElementById('search').value.trim().toLowerCase();
+  const source = document.getElementById('filter-source').value;
+  const tag    = document.getElementById('filter-tag').value;
+  const days   = parseInt(document.getElementById('filter-days').value);
+  const data   = currentTab === 'lit' ? allLit : allTrial;
+  const cutoff = days > 0
+    ? new Date(Date.now() - days * 86400000).toISOString().slice(0,10)
+    : null;
+
+  return data.filter(a => {
+    if (source && a.source !== source) return false;
+    if (tag && !(a.disease_tag || '').includes(tag)) return false;
+    if (cutoff && a.date < cutoff) return false;
+    if (q) {
+      const hay = [a.title_zh, a.title_en, a.authors,
+                   a.abstract_zh, a.abstract_en, a.journal].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+// ── Render ───────────────────────────────────────────────────────
+function render() {
+  const litF   = filterList(allLit);
+  const trialF = filterList(allTrial);
+  document.getElementById('count-lit').textContent   = allLit.length;
+  document.getElementById('count-trial').textContent = allTrial.length;
+
+  const items = currentTab === 'lit' ? litF : trialF;
+  const info  = document.getElementById('results-info');
+  const list  = document.getElementById('list');
+
+  info.textContent = `显示 ${items.length} 条${items.length < (currentTab==='lit'?allLit:allTrial).length ? '（已筛选）' : ''}`;
+
+  if (!items.length) {
+    list.innerHTML = `<div class="empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <div>没有符合条件的结果</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(a =>
+    currentTab === 'lit' ? renderLit(a) : renderTrial(a)
+  ).join('');
+}
+
+function filterList(data) {
+  const q      = document.getElementById('search').value.trim().toLowerCase();
+  const source = document.getElementById('filter-source').value;
+  const tag    = document.getElementById('filter-tag').value;
+  const days   = parseInt(document.getElementById('filter-days').value);
+  const cutoff = days > 0
+    ? new Date(Date.now() - days * 86400000).toISOString().slice(0,10)
+    : null;
+
+  return data.filter(a => {
+    if (source && a.source !== source) return false;
+    if (tag && !(a.disease_tag || '').includes(tag)) return false;
+    if (cutoff && a.date < cutoff) return false;
+    if (q) {
+      const hay = [a.title_zh, a.title_en, a.authors,
+                   a.abstract_zh, a.abstract_en, a.journal,
+                   a.institution, a.condition].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+// ── Disease tag badges ────────────────────────────────────────────
+function tagBadges(tag) {
+  if (!tag) return '';
+  return tag.split('/').map(t => {
+    t = t.trim();
+    const cls = t === 'NF1' ? 'badge-nf1'
+              : t === 'NF2' ? 'badge-nf2'
+              : t === 'MPNST' ? 'badge-mpnst'
+              : t.toLowerCase().includes('schwann') ? 'badge-schwannomatosis'
+              : 'badge-other';
+    return `<span class="badge ${cls}">${t}</span>`;
+  }).join('');
+}
+
+// ── Literature card ───────────────────────────────────────────────
+function renderLit(a) {
+  const title = a.url
+    ? `<a href="${a.url}" target="_blank" rel="noopener">${a.title_zh || a.title_en || '（无标题）'}</a>`
+    : (a.title_zh || a.title_en || '（无标题）');
+  const titleEn = a.title_en && a.title_zh ? `<div class="title-en">${a.title_en}</div>` : '';
+  const abstract = a.abstract_zh || a.abstract_en || '';
+  const abstractHtml = abstract
+    ? `<div class="abstract">${abstract}</div>` : '';
+  const doi = a.doi ? `<span>DOI: <a href="https://doi.org/${a.doi}" target="_blank" style="color:var(--accent)">${a.doi}</a></span>` : '';
+
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-badges">
+        <span class="badge badge-source">${a.source || ''}</span>
+        ${tagBadges(a.disease_tag)}
+      </div>
+      <div class="card-title">
+        <div class="title-zh">${title}</div>
+        ${titleEn}
+      </div>
+    </div>
+    <div class="card-meta">
+      ${a.authors ? `<span>👤 ${a.authors}</span>` : ''}
+      ${a.journal ? `<span>📖 ${a.journal}</span>` : ''}
+      ${a.pub_date ? `<span>📅 ${a.pub_date}</span>` : ''}
+      ${doi}
+    </div>
+    ${abstractHtml}
+  </div>`;
+}
+
+// ── Trial card ────────────────────────────────────────────────────
+function renderTrial(a) {
+  const title = a.url
+    ? `<a href="${a.url}" target="_blank" rel="noopener">${a.title_zh || a.title_en || '（无标题）'}</a>`
+    : (a.title_zh || a.title_en || '（无标题）');
+  const titleEn = a.title_en && a.title_zh ? `<div class="title-en">${a.title_en}</div>` : '';
+
+  const fields = [
+    ['机构', a.institution],
+    ['国家', a.country],
+    ['状态', a.trial_status],
+    ['阶段', a.phase],
+    ['适应症', a.condition],
+    ['药物', a.drug_name],
+    ['登记日期', a.pub_date],
+  ].filter(([,v]) => v).map(([l,v]) =>
+    `<div class="trial-field"><div class="label">${l}</div><div class="value">${v}</div></div>`
+  ).join('');
+
+  const abstract = a.abstract_en || '';
+  const abstractHtml = abstract
+    ? `<div class="abstract">${abstract}</div>` : '';
+
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-badges">
+        <span class="badge badge-source">${a.source || ''}</span>
+        ${tagBadges(a.disease_tag)}
+      </div>
+      <div class="card-title">
+        <div class="title-zh">${title}</div>
+        ${titleEn}
+      </div>
+    </div>
+    ${fields ? `<div class="trial-grid">${fields}</div>` : ''}
+    ${abstractHtml}
+  </div>`;
+}
+
+// ── Events ───────────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentTab = t.dataset.tab;
+    render();
+  });
+});
+
+['search','filter-source','filter-tag','filter-days'].forEach(id => {
+  document.getElementById(id).addEventListener('input', render);
+});
+
+loadData();
+</script>
+</body>
+</html>
