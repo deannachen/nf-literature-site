@@ -486,15 +486,21 @@ function tagBadges(tag) {
   }).join('');
 }
 
+function escapeText(value) {
+  return String(value || '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
 // ── Literature card ───────────────────────────────────────────────
 function renderLit(a) {
   const title = a.url
-    ? `<a href="${a.url}" target="_blank" rel="noopener">${a.title_zh || a.title_en || '（无标题）'}</a>`
-    : (a.title_zh || a.title_en || '（无标题）');
-  const titleEn = a.title_en && a.title_zh ? `<div class="title-en">${a.title_en}</div>` : '';
+    ? `<a href="${a.url}" target="_blank" rel="noopener">${escapeText(a.title_zh || a.title_en || '（无标题）')}</a>`
+    : escapeText(a.title_zh || a.title_en || '（无标题）');
+  const titleEn = a.title_en && a.title_zh ? `<div class="title-en">${escapeText(a.title_en)}</div>` : '';
   const abstract = a.abstract_zh || a.abstract_en || '';
   const abstractHtml = abstract
-    ? `<div class="abstract">${abstract}</div>` : '';
+    ? `<div class="abstract">${escapeText(abstract)}</div>` : '';
   const doi = a.doi ? `<span>DOI: <a href="https://doi.org/${a.doi}" target="_blank" style="color:var(--accent)">${a.doi}</a></span>` : '';
 
   return `<div class="card">
@@ -521,9 +527,9 @@ function renderLit(a) {
 // ── Trial card ────────────────────────────────────────────────────
 function renderTrial(a) {
   const title = a.url
-    ? `<a href="${a.url}" target="_blank" rel="noopener">${a.title_zh || a.title_en || '（无标题）'}</a>`
-    : (a.title_zh || a.title_en || '（无标题）');
-  const titleEn = a.title_en && a.title_zh ? `<div class="title-en">${a.title_en}</div>` : '';
+    ? `<a href="${a.url}" target="_blank" rel="noopener">${escapeText(a.title_zh || a.title_en || '（无标题）')}</a>`
+    : escapeText(a.title_zh || a.title_en || '（无标题）');
+  const titleEn = a.title_en && a.title_zh ? `<div class="title-en">${escapeText(a.title_en)}</div>` : '';
 
   const fields = [
     ['机构', a.institution],
@@ -537,9 +543,9 @@ function renderTrial(a) {
     `<div class="trial-field"><div class="label">${l}</div><div class="value">${v}</div></div>`
   ).join('');
 
-  const abstract = a.abstract_en || '';
+  const abstract = a.abstract_zh || a.abstract_en || '';
   const abstractHtml = abstract
-    ? `<div class="abstract">${abstract}</div>` : '';
+    ? `<div class="abstract">${escapeText(abstract)}</div>` : '';
 
   return `<div class="card">
     <div class="card-header">
